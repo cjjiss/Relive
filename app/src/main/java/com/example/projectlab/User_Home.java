@@ -5,12 +5,17 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +28,9 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,8 +50,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.auth.User;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class User_Home extends AppCompatActivity implements SensorEventListener {
+public class User_Home extends AppCompatActivity implements SensorEventListener  {
+    private static final String CHANNEL_ID="CHANNELID";
+    public static final int notificationId = 100;
     private int SMS_PERMISSION_CODE = 1;
     Button b1;
     Switch aSwitch,secsw;
@@ -71,7 +83,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home);
 
-        b1 = findViewById(R.id.button);
         aSwitch = findViewById(R.id.switch1);
         tv1 = findViewById(R.id.textView5);
         tv2 = findViewById(R.id.textView6);
@@ -96,6 +107,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
                 updateUIValue(location);
             }
         };
+
 
         aSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,13 +139,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
                         requestSmsPermission();
                     }
 
-                    b1.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent i = new Intent(User_Home.this,Accident.class);
-                            startActivity(i);
-                        }
-                    });
                 }
                 else {
                     //aSwitch.setText("not enabled");
@@ -276,9 +281,110 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
             editor.apply();
 
             sensorManager.unregisterListener(this);
-            Intent i = new Intent(User_Home.this,Accident.class);
+
+            notification();
+
+            Intent i = new Intent(User_Home.this,NotificationActivity.class);
             startActivity(i);
+
         }
+    }
+
+    private void notification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+        Intent intent = new Intent(this, MainActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_IMMUTABLE);
+        //1
+        /* Intent intent1 = new Intent(this, Accident.class);
+        stop();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent1 = PendingIntent.getActivity(this, 0, intent1,
+                PendingIntent.FLAG_IMMUTABLE);
+
+        //2
+        Intent intent2 = new Intent(this, User_Home.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent2 = PendingIntent.getActivity(this, 0, intent2,
+                PendingIntent.FLAG_IMMUTABLE);  */
+
+
+        sound();
+
+
+        NotificationCompat.Builder builder = new
+                NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("System Detected an ACCIDENT !!")
+                .setContentText("Alert will be sent if not disabled withing 15 secs")
+
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+
+       /* builder.addAction(R.drawable.ic_alert_foreground,"ALERT",pendingIntent1);
+
+        builder.addAction(R.drawable.ic_cancel_foreground,"CANCEL",pendingIntent2);
+       */
+        builder.setVibrate(new long[] { });
+
+
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+// notificationId is a unique int for each notification that you must define
+        notificationManager.notify(notificationId, builder.build());
+
+
+            /*Intent i = new Intent(User_Home.this,Accident.class);
+            startActivity(i);*/
+    }
+
+    private void stop() {
+        Uri alarmSound =
+                RingtoneManager. getDefaultUri (RingtoneManager. TYPE_ALARM);
+        MediaPlayer mp = MediaPlayer. create (getApplicationContext(), alarmSound);
+        final Timer t = new Timer();
+        t.schedule(new TimerTask() {
+                       @Override
+                       public void run() {
+                           mp.stop();
+                           t.cancel();
+                       }
+                   },5000
+
+        );
+
+    }
+
+    private void sound() {
+        Uri alarmSound =
+                RingtoneManager. getDefaultUri (RingtoneManager. TYPE_ALARM);
+        MediaPlayer mp = MediaPlayer. create (getApplicationContext(), alarmSound);
+        mp.start();
+        final Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mp.stop();
+                t.cancel();
+            }
+        },15000
+
+        );
+
     }
 
     @Override
