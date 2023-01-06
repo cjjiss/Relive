@@ -88,8 +88,7 @@ public class Accident extends AppCompatActivity {
                                 txt_email.setText(str_email);
 
                                 //hospital phone number
-                                fstore.collection("USERS")
-                                        .whereEqualTo("confirm","confirm")
+                                fstore.collection("HOSPITALS")
                                         .get()
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
@@ -104,7 +103,7 @@ public class Accident extends AppCompatActivity {
                                                         txt_hospital.setText(str_hospital);
 
                                                         SmsManager smsManager = SmsManager.getDefault();
-                                                        String message = "ALERT !! AN accident has occured on http://maps.google.com/?q=" + lat + "," + lon + " , persons details are -"+ " Name: " +str_name ;
+                                                        String message = "ALERT !! AN accident has occurred on http://maps.google.com/?q=" + lat + "," + lon + " , persons details are -"+ " Name: " +str_name ;
                                                         String message2 =  "Blood type : " +str_blood +" Address : "+str_address;
                                                         smsManager.sendTextMessage(str_hospital,null,message,null,null);
                                                         smsManager.sendTextMessage(str_hospital,null,message2,null,null);
