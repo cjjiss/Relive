@@ -64,6 +64,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
     double accelerationX, accelerationY, accelerationZ, a, G, speeddouble;
     int threshold = 4;
     TextView tv1, tv2;
+    Location location;
 
 
     //gps
@@ -103,7 +104,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                Location location = locationResult.getLastLocation();
+                 location = locationResult.getLastLocation();
                 updateUIValue(location);
             }
         };
@@ -180,6 +181,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
     }
 
+
     private void updateUIValue(Location location) {
         lat = String.valueOf(location.getLatitude());
         lon = String.valueOf(location.getLongitude());
@@ -253,6 +255,11 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
     }
 
+    private void LatandLong(Location location) {
+        lat = String.valueOf(location.getLatitude());
+        lon = String.valueOf(location.getLongitude());
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         Log.d(TAG,"X " +sensorEvent.values[0] +"Y "+ sensorEvent.values[1] + "Z "+ sensorEvent.values[2] );
@@ -272,8 +279,11 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
 
         /*** Detect Accident ***/
-        if (G > threshold && speeddouble > 0.0001 ) {
+        if (G > threshold && speeddouble > 0.01 ) {
             Toast.makeText(this, "Accident occured", Toast.LENGTH_SHORT).show();
+
+            LatandLong(location);
+
             SharedPreferences sharedPref = getSharedPreferences("myKey", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("value1", lat);

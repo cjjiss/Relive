@@ -10,4 +10,6 @@
     <color name="grey"> #a9a9a9</color>
     <color name="darkyellow"> #ffbd59</color>
     <color name="redpink"> #f08486</color>
+    <color name="welcome">#FECE2F</color>
+    <color name="offwhite">#BABABA</color>
 </resources>
