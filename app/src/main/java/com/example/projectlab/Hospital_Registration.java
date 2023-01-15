@@ -2,9 +2,16 @@ package com.example.projectlab;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +26,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+
 public class Hospital_Registration extends AppCompatActivity {
     EditText e1,e2,e3,e4,e5,e6;
     Button b1;
@@ -26,6 +35,11 @@ public class Hospital_Registration extends AppCompatActivity {
 
     FirebaseAuth auth;
     FirebaseFirestore firestore;
+
+    Location location;
+
+    HashMap<String, Object> data = new HashMap<>();
+    private LocationManager locationManager;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -46,6 +60,20 @@ public class Hospital_Registration extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request permission if it hasn't been granted
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        } else {
+            // Get the last known location if permission has been granted
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            double latitude = lastKnownLocation.getLatitude();
+            double longitude = lastKnownLocation.getLongitude();
+
+            data.put("latitude", latitude);
+            data.put("longitude", longitude);
+        }
+
         t1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,12 +85,23 @@ public class Hospital_Registration extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String nameh = e1.getText().toString().trim();
                 String emailh = e2.getText().toString().trim();
                 String addressh = e3.getText().toString().trim();
                 String phoneh = e4.getText().toString().trim();
                 String passh = e5.getText().toString().trim();
                 String cpassh =  e6.getText().toString().trim();
+
+
+                data.put("Name", nameh);
+                data.put("Email", emailh);
+                data.put("Address", addressh);
+                data.put("Phone", phoneh);
+                data.put("Password", passh);
+
+
+
 
                 //validation
 
@@ -95,8 +134,8 @@ public class Hospital_Registration extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful())
                                 {
-                                    HospitalData hospitalData = new HospitalData(nameh,emailh,addressh,phoneh);
-                                    firestore.collection("USERS").document(phoneh).set(hospitalData);
+
+                                    firestore.collection("HOSPITALS").add(data);
                                     Toast.makeText(Hospital_Registration.this,"Hospital successfully Registered",Toast.LENGTH_SHORT).show();
                                     Intent i2 = new Intent(Hospital_Registration.this,Hospital_login.class);
                                     startActivity(i2);
