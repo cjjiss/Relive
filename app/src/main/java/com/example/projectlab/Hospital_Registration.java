@@ -36,10 +36,7 @@ public class Hospital_Registration extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseFirestore firestore;
 
-    Location location;
-
     HashMap<String, Object> data = new HashMap<>();
-    private LocationManager locationManager;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -99,9 +96,6 @@ public class Hospital_Registration extends AppCompatActivity {
                 data.put("Address", addressh);
                 data.put("Phone", phoneh);
                 data.put("Password", passh);
-
-
-
 
                 //validation
 

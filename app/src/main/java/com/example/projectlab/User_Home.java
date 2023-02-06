@@ -46,9 +46,16 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.api.LogDescriptor;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.auth.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -75,6 +82,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationCallback locationCallback;
+    FirebaseFirestore fstore;
 
     String speed, address,lat,lon;
 
@@ -87,6 +95,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
         aSwitch = findViewById(R.id.switch1);
         tv1 = findViewById(R.id.textView5);
         tv2 = findViewById(R.id.textView6);
+        fstore = FirebaseFirestore.getInstance();
 
 
         //accelerometer
@@ -147,7 +156,9 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
                 }
             }
         });
+
     }
+
 
     private void stopLocationUpdates() {
         tv1.setText("stopped");
@@ -256,8 +267,12 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
     }
 
     private void LatandLong(Location location) {
-        lat = String.valueOf(location.getLatitude());
-        lon = String.valueOf(location.getLongitude());
+        /*
+        String str_lat = String.valueOf(location.getLatitude());
+        String str_lon = String.valueOf(location.getLongitude());
+        double lat = Double.parseDouble(str_lat);
+        double lon = Double.parseDouble(str_lon);
+        */
     }
 
     @Override
@@ -275,7 +290,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
         G = a/9.81;
 
-        Log.e(TAG, "onSensorChanged: " +G );
+        Log.e(TAG, "Gforce: " +G );
 
 
         /*** Detect Accident ***/
