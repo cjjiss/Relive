@@ -19,6 +19,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +42,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -50,6 +54,8 @@ public class Accident extends AppCompatActivity {
     FirebaseFirestore fstore;
     String userId;
     LocationManager locationManager;
+
+    Double first;
 
 
     @SuppressLint("MissingInflatedId")
@@ -113,7 +119,12 @@ public class Accident extends AppCompatActivity {
                                         Log.d(TAG, "LATITUDE AND LONGITUDE : " +arrayList);
 
                                         double aLat = 0,aLong = 0,dLat=0,dLong=0,blat =0, blong=0;
+                                        double temp = 0;
+                                        double hlat = 0;
+                                        double hlong =0;
                                         ArrayList<Double> DistList = new ArrayList<>();
+                                        ArrayList<Double> latlist = new ArrayList<>();
+                                        ArrayList<Double> longlist = new ArrayList<>();
 
                                         for (int i =0 ; i<arrayList.size() ; i= i+2) {
 
@@ -124,8 +135,8 @@ public class Accident extends AppCompatActivity {
                                             Log.d(TAG, "arraylist 1  : " +aLat);
                                             Log.d(TAG, "arraylist 2  : " +aLong);
 
-                                            dLat = Math.toRadians(Clat - aLat);
-                                            dLong = Math.toRadians(Clong - aLong);
+                                            dLat = Math.toRadians(aLat - Clat);
+                                            dLong = Math.toRadians(aLong - Clong);
 
                                             Log.d(TAG, "Difference lat : " +dLat);
                                             Log.d(TAG, "Difference long  : " +dLong);
@@ -137,14 +148,60 @@ public class Accident extends AppCompatActivity {
                                             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                                             double d = R * c; // Distance in km
 
-                                            DistList.add(d);
-
                                             Log.d(TAG, "a : " +a);
                                             Log.d(TAG, "c  : " +c);
                                             Log.d(TAG, "Distance in km  : " +d);
 
+                                            DistList.add(d); // added distance to dist arraylist
+
+                                            latlist.add(aLat); // added all latitudes and longitude to arraylist
+                                            longlist.add(aLong);
+
+                                            ArrayList DistSort = (ArrayList)DistList.clone();
+                                            Collections.sort(DistSort); // added sorted distance to distsort arraylist
+                                            first = (Double) DistSort.get(0);// got the first element since shortest first
+
+                                            int index = DistList.indexOf(first); // got first index
+                                             hlat = latlist.get(index); // got hospital latitude
+                                            hlong = longlist.get(index);
+
+
                                         }
+                                        FirebaseFirestore f2 = FirebaseFirestore.getInstance();
+                                        f2.collection("HOSPITALS")
+                                                .whereEqualTo("latitude",hlat)
+                                                .whereEqualTo("longitude",hlong)
+                                                .get()
+                                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                                            String HospitalPhone = documentSnapshot.getString("Phone");
+                                                            Log.d("Hospital Phone", HospitalPhone);
+                                                            SmsManager smsManager = SmsManager.getDefault();
+                                                            String message = "ALERT !! AN accident has occurred on http://maps.google.com/?q=" + Clat + "," + Clong + " , persons details are -"+ " Name: " +str_name ;
+                                                            String message2 =  "Blood type : " +str_blood +" Address : "+str_address;
+                                                            smsManager.sendTextMessage(HospitalPhone,null,message,null,null);
+                                                            smsManager.sendTextMessage(HospitalPhone,null,message2,null,null);
+
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.e("Error", e.getMessage());
+                                                    }
+                                                });
                                         Log.d(TAG,"Final distances in kms :" +DistList);
+                                        Log.d(TAG," latitidue :"+latlist);
+                                        Log.d(TAG," longitude :"+longlist);
+
+                                        Log.d(TAG,"Shortest Distance :" +first);
+                                        Log.d(TAG,"Shortest Latitude :" +hlat);
+                                        Log.d(TAG,"Shortest Longitude :" +hlong);
+
+
                                     }else {
                                         Log.d(TAG,"Error getting documents:",task.getException());
                                     }
@@ -170,14 +227,12 @@ public class Accident extends AppCompatActivity {
                             if(documentSnapshot != null && documentSnapshot.exists()){
                                 str_name = documentSnapshot.getString("name");
                                 str_blood = documentSnapshot.getString("blood");
-                                str_phone = documentSnapshot.getString("phone");
                                 str_address = documentSnapshot.getString("address");
                                 str_email = documentSnapshot.getString("email");
 
 
                                 txt_name.setText(str_name);
                                 txt_blood.setText(str_blood);
-                                txt_phone.setText(str_phone);
                                 txt_address.setText(str_address);
                                 txt_email.setText(str_email);
 

@@ -194,9 +194,10 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
 
     private void updateUIValue(Location location) {
+        /*
         lat = String.valueOf(location.getLatitude());
         lon = String.valueOf(location.getLongitude());
-
+            */
         if (location.hasSpeed()) {
             speed = String.valueOf(location.getSpeed());
             speeddouble = Double.valueOf(location.getSpeed());
@@ -332,18 +333,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE);
-        //1
-        /* Intent intent1 = new Intent(this, Accident.class);
-        stop();
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent1 = PendingIntent.getActivity(this, 0, intent1,
-                PendingIntent.FLAG_IMMUTABLE);
-
-        //2
-        Intent intent2 = new Intent(this, User_Home.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent2 = PendingIntent.getActivity(this, 0, intent2,
-                PendingIntent.FLAG_IMMUTABLE);  */
 
 
         sound();
