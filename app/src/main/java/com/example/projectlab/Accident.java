@@ -72,7 +72,6 @@ public class Accident extends AppCompatActivity {
         txt_phone = findViewById(R.id.tv_phone);
         txt_address = findViewById(R.id.tv_address);
         txt_email = findViewById(R.id.tv_email);
-        txt_hospital = findViewById(R.id.tv_5);
 
 
         Auth = FirebaseAuth.getInstance();
@@ -118,7 +117,7 @@ public class Accident extends AppCompatActivity {
                                         }
                                         Log.d(TAG, "LATITUDE AND LONGITUDE : " +arrayList);
 
-                                        double aLat = 0,aLong = 0,dLat=0,dLong=0,blat =0, blong=0;
+                                        double aLat = 0,aLong = 0,dLat=0,dLong=0;
                                         double temp = 0;
                                         double hlat = 0;
                                         double hlong =0;
@@ -161,6 +160,7 @@ public class Accident extends AppCompatActivity {
                                             Collections.sort(DistSort); // added sorted distance to distsort arraylist
                                             first = (Double) DistSort.get(0);// got the first element since shortest first
 
+                                            temp = Math.round(first);
                                             int index = DistList.indexOf(first); // got first index
                                              hlat = latlist.get(index); // got hospital latitude
                                             hlong = longlist.get(index);
@@ -168,6 +168,9 @@ public class Accident extends AppCompatActivity {
 
                                         }
                                         FirebaseFirestore f2 = FirebaseFirestore.getInstance();
+
+                                        double finalTemp = temp;
+
                                         f2.collection("HOSPITALS")
                                                 .whereEqualTo("latitude",hlat)
                                                 .whereEqualTo("longitude",hlong)
@@ -179,10 +182,11 @@ public class Accident extends AppCompatActivity {
                                                             String HospitalPhone = documentSnapshot.getString("Phone");
                                                             Log.d("Hospital Phone", HospitalPhone);
                                                             SmsManager smsManager = SmsManager.getDefault();
-                                                            String message = "ALERT !! AN accident has occurred on http://maps.google.com/?q=" + Clat + "," + Clong + " , persons details are -"+ " Name: " +str_name ;
-                                                            String message2 =  "Blood type : " +str_blood +" Address : "+str_address;
-                                                            smsManager.sendTextMessage(HospitalPhone,null,message,null,null);
-                                                            smsManager.sendTextMessage(HospitalPhone,null,message2,null,null);
+
+                                                            String message = "ALERT !! An accident has occurred on http://maps.google.com/?q=" + Clat + "," + Clong + " .The details of the person are :-\n"+ " Name : " +str_name +
+                                                                              " ,Blood type : " +str_blood +" ,Local Address : "+str_address + ".This is the nearest hospital which is  " + finalTemp + "kms away.";
+                                                            ArrayList<String> parts= smsManager.divideMessage(message);
+                                                            smsManager.sendMultipartTextMessage(HospitalPhone,null,parts,null,null);
 
                                                         }
                                                     }

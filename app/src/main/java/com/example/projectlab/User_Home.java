@@ -17,6 +17,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,10 +30,12 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -55,6 +58,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.auth.User;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -64,6 +68,10 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
     private static final String CHANNEL_ID="CHANNELID";
     public static final int notificationId = 100;
     private int SMS_PERMISSION_CODE = 1;
+    private static int MICROPHONE_PERMISSION_CODE = 200;
+    MediaRecorder mediaRecorder;
+    int amp ;
+    double db;
     Button b1;
     Switch aSwitch,secsw;
     SensorManager sensorManager;
@@ -124,6 +132,9 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
             public void onClick(View view) {
                 if (aSwitch.isChecked()) {
                     //turn on
+                    if (isMicrophonePresent()) {
+                        getMicrophonePresent();
+                    }
                     startLocationUpdates();
                 } else {
                     stopLocationUpdates();
@@ -148,15 +159,9 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
                     else {
                         requestSmsPermission();
                     }
-
-                }
-                else {
-                    //aSwitch.setText("not enabled");
-
                 }
             }
         });
-
     }
 
 
@@ -198,6 +203,25 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
         lat = String.valueOf(location.getLatitude());
         lon = String.valueOf(location.getLongitude());
             */
+        try {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setOutputFile(getRecordingFilePath());
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new RecorderTask(mediaRecorder), 0, 1000);
+
+            Toast.makeText(this, "Recording is started", Toast.LENGTH_SHORT).show();
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
         if (location.hasSpeed()) {
             speed = String.valueOf(location.getSpeed());
             speeddouble = Double.valueOf(location.getSpeed());
@@ -213,7 +237,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
             tv2.setText(address);
         }catch (Exception e){
             address="unable to get the street address";
-
         }
     }
 
@@ -292,10 +315,11 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
         G = a/9.81;
 
         Log.e(TAG, "Gforce: " +G );
+        Log.d("Db value :", String.valueOf(+db));
 
 
         /*** Detect Accident ***/
-        if (G > threshold && speeddouble > 0.01 ) {
+        if (G > threshold && speeddouble > 0.01 && db > 75) {
             Toast.makeText(this, "Accident occured", Toast.LENGTH_SHORT).show();
 
             LatandLong(location);
@@ -349,10 +373,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
                 .setAutoCancel(true);
 
 
-       /* builder.addAction(R.drawable.ic_alert_foreground,"ALERT",pendingIntent1);
-
-        builder.addAction(R.drawable.ic_cancel_foreground,"CANCEL",pendingIntent2);
-       */
         builder.setVibrate(new long[] { });
 
 
@@ -361,9 +381,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 // notificationId is a unique int for each notification that you must define
         notificationManager.notify(notificationId, builder.build());
 
-
-            /*Intent i = new Intent(User_Home.this,Accident.class);
-            startActivity(i);*/
     }
 
     private void stop() {
@@ -399,6 +416,39 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
         );
 
+    }
+    private boolean isMicrophonePresent() {
+        if (this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void getMicrophonePresent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MICROPHONE_PERMISSION_CODE);
+        }
+    }
+    private String getRecordingFilePath() {
+        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
+        File musicDirectory = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        File file = new File(musicDirectory, "testRecordingFile" + ".mp3");
+        return file.getPath();
+    }
+    private class RecorderTask extends TimerTask {
+        private MediaRecorder recorder;
+
+        public RecorderTask(MediaRecorder recorder) {
+            this.recorder = recorder;
+        }
+
+        public void run() {
+            amp = recorder.getMaxAmplitude();
+
+            db = 20 * Math.log10(amp);
+        }
     }
 
     @Override
