@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class Hospital_login extends AppCompatActivity {
     EditText e1, e2;
@@ -22,6 +25,8 @@ public class Hospital_login extends AppCompatActivity {
     TextView t1;
 
     FirebaseAuth mAuth;
+    FirebaseFirestore firestore ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,7 @@ public class Hospital_login extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         t1 = (TextView) findViewById(R.id.textView3);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         t1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,11 +60,48 @@ public class Hospital_login extends AppCompatActivity {
                 if (emailh.isEmpty())
                 {
                     e1.setError("Email Required");
+                    return;
                 }
-                else if (passh.isEmpty())
+                if (passh.isEmpty())
                 {
                     e2.setError("Password Required");
+                    return;
                 }
+
+                mAuth.signInWithEmailAndPassword(emailh, passh)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()){
+                                    //IF EMAIL & PASSWORD MATCHES
+                                    db.collection("HOSPITALS")
+                                            .whereEqualTo("Email", emailh)
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                                            Intent i = new Intent(Hospital_login.this, Hospital_home.class);
+                                                            startActivity(i);
+                                                            finish();
+                                                            Toast.makeText(Hospital_login.this, "SIGNED IN SUCCESSFULLY", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } else {
+                                                        Toast.makeText(Hospital_login.this, "FAILED!", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+
+                                }
+                            }
+                        });
+
+            }
+        });
+
+                /*
                 else {
                     mAuth.signInWithEmailAndPassword(emailh,passh).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
@@ -68,15 +111,16 @@ public class Hospital_login extends AppCompatActivity {
                                 Toast.makeText(Hospital_login.this,"Successfully Logged in",Toast.LENGTH_SHORT).show();
                                 Intent i2 = new Intent(Hospital_login.this,Hospital_home.class);
                                 startActivity(i2);
+                                finish();
+
+                            firestore.collection("HOSPITAL").whereEqualTo("Email",emailh).get().
                             }
                             else{
                                 Toast.makeText(Hospital_login.this,"Log in Error" + task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                }
-            }
-        });
+                } */
 
     }
 }

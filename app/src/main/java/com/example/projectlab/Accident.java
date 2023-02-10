@@ -36,7 +36,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -44,7 +46,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Accident extends AppCompatActivity {
@@ -56,6 +60,8 @@ public class Accident extends AppCompatActivity {
     LocationManager locationManager;
 
     Double first;
+
+    int flag = 1;
 
 
     @SuppressLint("MissingInflatedId")
@@ -179,14 +185,18 @@ public class Accident extends AppCompatActivity {
                                                     @Override
                                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                                            String HospitalPhone = documentSnapshot.getString("Phone");
-                                                            Log.d("Hospital Phone", HospitalPhone);
-                                                            SmsManager smsManager = SmsManager.getDefault();
 
-                                                            String message = "ALERT !! An accident has occurred on http://maps.google.com/?q=" + Clat + "," + Clong + " .The details of the person are :-\n"+ " Name : " +str_name +
-                                                                              " ,Blood type : " +str_blood +" ,Local Address : "+str_address + ".This is the nearest hospital which is  " + finalTemp + "kms away.";
-                                                            ArrayList<String> parts= smsManager.divideMessage(message);
-                                                            smsManager.sendMultipartTextMessage(HospitalPhone,null,parts,null,null);
+                                                            if (flag == 1 ){
+                                                                String HospitalPhone = documentSnapshot.getString("Phone");
+                                                                Log.d("Hospital Phone", HospitalPhone);
+                                                                SmsManager smsManager = SmsManager.getDefault();
+
+                                                                String message = "ALERT !! An accident has occurred on http://maps.google.com/?q=" + Clat + "," + Clong + " .The details of the person are :-\n"+ " Name : " +str_name +
+                                                                        " ,Blood type : " +str_blood +" ,Local Address : "+str_address + ".This is the nearest hospital which is  " + finalTemp + "kms away.";
+                                                                ArrayList<String> parts= smsManager.divideMessage(message);
+                                                                smsManager.sendMultipartTextMessage(HospitalPhone,null,parts,null,null);
+
+                                                            }
 
                                                         }
                                                     }
@@ -215,10 +225,6 @@ public class Accident extends AppCompatActivity {
                     }
                 });
 
-
-
-//retrieving and storing in arraylist
-
         //retrieving
         fstore.collection("USERS")
                 .document(userId)
@@ -233,38 +239,12 @@ public class Accident extends AppCompatActivity {
                                 str_blood = documentSnapshot.getString("blood");
                                 str_address = documentSnapshot.getString("address");
                                 str_email = documentSnapshot.getString("email");
-
-
+                                
                                 txt_name.setText(str_name);
                                 txt_blood.setText(str_blood);
                                 txt_address.setText(str_address);
                                 txt_email.setText(str_email);
 
-                                /*
-                                //hospital phone number
-                                fstore.collection("HOSPITALS")
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if(task.isSuccessful()){
-                                                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
-                                                        //send sms on accident
-                                                        SharedPreferences sharedPreferences = getSharedPreferences("myKey", MODE_PRIVATE);
-                                                        String lat = sharedPreferences.getString("value1","");
-                                                        String lon = sharedPreferences.getString("value2","");
-                                                        str_hospital = documentSnapshot.getString("phone");
-                                                        txt_hospital.setText(str_hospital);
-
-                                                        SmsManager smsManager = SmsManager.getDefault();
-                                                        String message = "ALERT !! AN accident has occurred on http://maps.google.com/?q=" + lat + "," + lon + " , persons details are -"+ " Name: " +str_name ;
-                                                        String message2 =  "Blood type : " +str_blood +" Address : "+str_address;
-                                                        smsManager.sendTextMessage(str_hospital,null,message,null,null);
-                                                        smsManager.sendTextMessage(str_hospital,null,message2,null,null);
-                                                    }
-                                                }
-                                            }
-                                        }); */
                             }
                         }
                     }

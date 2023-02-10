@@ -14,6 +14,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="84dp"
         android:layout_marginEnd="50dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Rider's Details "
         android:textColor="@color/black"
@@ -27,7 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
-        android:text="The owner of this phone has encountered"
+        android:fontFamily="@font/open_sans"
+        android:text="The owner of this phone has"
         android:textColor="@color/black"
         android:textSize="19sp"
         app:layout_constraintEnd_toEndOf="@+id/textView8"
@@ -39,7 +41,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="with an accident and owner's details are :"
+        android:fontFamily="@font/open_sans"
+        android:text="encountered with an accident"
         android:textColor="@color/black"
         android:textSize="19sp"
         app:layout_constraintEnd_toEndOf="@+id/textView19"
@@ -48,11 +51,26 @@
         app:layout_constraintTop_toBottomOf="@+id/textView19" />
 
     <TextView
+        android:id="@+id/textView28"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/open_sans"
+        android:text="and owners details are :"
+        android:textColor="@color/black"
+        android:textSize="19sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView19"
+        app:layout_constraintHorizontal_bias="0.263"
+        app:layout_constraintStart_toStartOf="@+id/textView19"
+        app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
+    <TextView
         android:id="@+id/textView30"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_marginTop="280dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Name : "
         android:textColor="@color/black"
@@ -67,20 +85,24 @@
         android:id="@+id/tv_name"
         android:layout_width="240dp"
         android:layout_height="30dp"
-        android:layout_marginTop="280dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="@font/open_sans_semibold"
         android:text="name"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/textView30"
+        app:layout_constraintTop_toBottomOf="@+id/textView20" />
 
     <TextView
         android:id="@+id/textView31"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="35dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Blood : "
         android:textColor="@color/black"
@@ -94,12 +116,15 @@
         android:id="@+id/tv_blood"
         android:layout_width="200dp"
         android:layout_height="30dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="@font/open_sans_semibold"
         android:text="blood"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView31"
         app:layout_constraintTop_toBottomOf="@+id/tv_name" />
 
     <TextView
@@ -107,7 +132,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="35dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Phone : "
         android:textColor="@color/black"
@@ -119,12 +145,15 @@
         android:id="@+id/tv_phone"
         android:layout_width="240dp"
         android:layout_height="30dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="30dp"
+        android:fontFamily="@font/open_sans_semibold"
         android:text="phone"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView32"
         app:layout_constraintTop_toBottomOf="@+id/tv_blood" />
 
     <TextView
@@ -132,7 +161,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="45dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Address : "
         android:textColor="@color/black"
@@ -144,12 +174,16 @@
         android:id="@+id/tv_address"
         android:layout_width="240dp"
         android:layout_height="40dp"
-        android:layout_marginTop="22dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="35dp"
+        android:fontFamily="@font/open_sans_semibold"
         android:text="address"
         android:textColor="@android:color/black"
         android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_email"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView33"
         app:layout_constraintTop_toBottomOf="@+id/tv_phone" />
 
     <TextView
@@ -157,7 +191,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="45dp"
+
         android:fontFamily="@font/poppins_bold"
         android:text="Email : "
         android:textColor="@color/black"
@@ -169,12 +204,14 @@
         android:id="@+id/tv_email"
         android:layout_width="240dp"
         android:layout_height="30dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="35dp"
         android:layout_marginEnd="16dp"
+        android:fontFamily="@font/open_sans_semibold"
         android:text="email"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView34"
         app:layout_constraintTop_toBottomOf="@+id/tv_address" />
 
     <ImageView

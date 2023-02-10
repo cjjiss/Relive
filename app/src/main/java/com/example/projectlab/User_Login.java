@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class User_Login extends AppCompatActivity {
     EditText e1, e2;
@@ -22,6 +25,7 @@ public class User_Login extends AppCompatActivity {
     TextView t1;
 
     FirebaseAuth mAuth;
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,7 @@ public class User_Login extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         t1 =findViewById(R.id.textView);
+        db = FirebaseFirestore.getInstance();
 
         t1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,11 +67,27 @@ public class User_Login extends AppCompatActivity {
                     mAuth.signInWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful())
-                            {
-                                Toast.makeText(User_Login.this,"Successfully Logged in",Toast.LENGTH_SHORT).show();
-                                Intent i2 = new Intent(User_Login.this,User_Home.class);
-                                startActivity(i2);
+                            if (task.isSuccessful()){
+                                //IF EMAIL & PASSWORD MATCHES
+                                db.collection("USERS")
+                                        .whereEqualTo("email", email)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        Intent intentStudent = new Intent(User_Login.this, User_Home.class);
+                                                        startActivity(intentStudent);
+                                                        finish();
+                                                        Toast.makeText(User_Login.this, "SIGNED IN SUCCESSFULLY", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                } else {
+                                                    Toast.makeText(User_Login.this, "FAILED!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+
                             }
                             else{
                                 Toast.makeText(User_Login.this,"Log in Error" + task.getException().getMessage(),Toast.LENGTH_SHORT).show();

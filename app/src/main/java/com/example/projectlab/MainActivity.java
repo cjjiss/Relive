@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent i = new Intent(MainActivity.this,User_Login.class);
                     startActivity(i);
+                    finish();
             }
         });
         v2.setOnClickListener(new View.OnClickListener() {
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i2 = new Intent(MainActivity.this,Hospital_login.class);
                 startActivity(i2);
+                finish();
             }
         });
     }

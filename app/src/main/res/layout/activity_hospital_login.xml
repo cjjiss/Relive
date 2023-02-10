@@ -98,6 +98,7 @@
         android:id="@+id/textView12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:fontFamily="@font/poppins_bold"
         android:text="RELIVE"
         android:textColor="@color/black"
@@ -111,6 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="41dp"
+
         android:fontFamily="@font/open_sans_bold"
         android:text="Login"
         android:textColor="@color/black"

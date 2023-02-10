@@ -215,8 +215,6 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new RecorderTask(mediaRecorder), 0, 1000);
 
-            Toast.makeText(this, "Recording is started", Toast.LENGTH_SHORT).show();
-
         }
         catch (Exception e){
             e.printStackTrace();
@@ -364,7 +362,7 @@ public class User_Home extends AppCompatActivity implements SensorEventListener 
 
         NotificationCompat.Builder builder = new
                 NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_carcrash_foreground)
                 .setContentTitle("System Detected an ACCIDENT !!")
                 .setContentText("Alert will be sent if not disabled withing 15 secs")
 
